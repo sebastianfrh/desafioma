@@ -9,6 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
 @Table(name="productos")
 public class Producto implements Serializable{
@@ -18,14 +22,20 @@ public class Producto implements Serializable{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
+	
 	@Column(name="nombre", length=80)
 	private String nombre;
+	
 	@Column(name="descripcion_corta", length=150)
 	private String descripcionCorta;
+	
 	@Column(name="descripcion_larga", length=300)
 	private String descripcionLarga;
+	
 	@Column(name="precio_unitario")
 	private Float precioUnitario;
+	
+	public Producto() {}
 	
 	public String getNombre() {
 		return nombre;
@@ -63,5 +73,8 @@ public class Producto implements Serializable{
 		return id;
 	}
 	
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 }
