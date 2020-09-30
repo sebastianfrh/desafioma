@@ -8,10 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="productos")
@@ -23,15 +22,22 @@ public class Producto implements Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotNull
+	@NotEmpty
+	@Size(min=10, max=80)
 	@Column(name="nombre", length=80)
 	private String nombre;
 	
-	@Column(name="descripcion_corta", length=150)
+	@NotNull
+	@NotEmpty
+	@Size(min=10, max=150)
+	@Column(name="descripcion_corta", length=150, nullable=false)
 	private String descripcionCorta;
 	
 	@Column(name="descripcion_larga", length=300)
 	private String descripcionLarga;
 	
+	@NotNull
 	@Column(name="precio_unitario")
 	private Float precioUnitario;
 	

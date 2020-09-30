@@ -1,5 +1,7 @@
 package com.ma.pedidos.daoControllers.pedidos;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,11 @@ public class PedidosService implements IPedidosService{
 	@Override
 	public PedidoCabecera save(PedidoCabecera pedido) {
 		return pedidoDao.save(pedido);
+	}
+
+	@Override
+	public List<PedidoCabecera> findByDate(Date date) {
+		return pedidoDao.findByFecha(date);
 	}
 
 }

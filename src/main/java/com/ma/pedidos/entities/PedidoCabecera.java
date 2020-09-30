@@ -9,19 +9,21 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 @Entity
@@ -34,21 +36,29 @@ public class PedidoCabecera implements Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotNull
+	@NotEmpty
 	@Column(name="direccion", length=150)
 	private String direccion;
 	
+	@NotEmpty
+	@Email
 	@Column(name="mail", length=60)
 	private String mail;
 	
+	@NotNull
+	@NotEmpty
 	@Column(name="telefono", length=20)
 	private String telefono;
 	
 	@Temporal(TemporalType.DATE)
 	@Column(name="fecha_alta")
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date fecha;
 	
 	@Temporal(TemporalType.TIME)
 	@Column(name="horario")
+	@JsonFormat(pattern="HH:mm")
 	private Date hora;
 	
 	@Column(name="monto_total")
@@ -61,11 +71,39 @@ public class PedidoCabecera implements Serializable{
 	@Column(name="estado")
     private Estado estado;
 	
+	@NotNull
+	@Valid
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name="cabecera_id")
-	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-	@JsonIdentityReference(alwaysAsId = true)
 	private List<PedidoDetalle> detalle;
+	
+	@PrePersist
+    private void prePersist(){
+		if(this.precioTotal == null)
+			this.precioTotal = this.calcularTotal();
+		
+		if(this.estado == null)
+			this.estado = Estado.PENDIENTE;
+	}
+	
+	private float calcularTotal() {
+		float total = 0;
+		this.descuento = this.aplicaDescuento();
+		for(PedidoDetalle det:this.detalle) {
+			total += det.getPrecioUnitario();
+		}
+		
+		return (float) (this.descuento?(total*0.7):total);
+	}
+	
+	private boolean aplicaDescuento() {
+		float cantProductos = 0;
+		for(PedidoDetalle det:this.detalle) {
+			cantProductos += det.getCantidad();
+		}
+
+		return cantProductos > 3;
+	}
 
 	public List<PedidoDetalle> getDetalle() {
 		return detalle;
