@@ -1,10 +1,10 @@
 package com.ma.pedidos.error;
 
-public class RestErrors {
+public class RestControllerError {
 
 	private String error;
 	
-	public RestErrors(String error) {
+	public RestControllerError(String error) {
 		this.error = error;
 	}
 

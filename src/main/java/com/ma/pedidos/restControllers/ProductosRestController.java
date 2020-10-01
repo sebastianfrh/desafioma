@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ma.pedidos.daoControllers.productos.IProductosService;
 import com.ma.pedidos.entities.Producto;
-import com.ma.pedidos.error.RestErrors;
+import com.ma.pedidos.error.RestControllerError;
 
 @RestController
 @RequestMapping (value="productos")
@@ -50,7 +50,7 @@ public class ProductosRestController {
 		if(prod.isPresent()) 
 			return ResponseEntity.ok().body(productosService.update(id,producto));
 		else
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestErrors("Producto no encontrado"));		   
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestControllerError("Producto no encontrado"));		   
 	}
 	
 	@GetMapping(value="/{id}")
@@ -59,7 +59,7 @@ public class ProductosRestController {
 		if(prod.isPresent()) 
 			 return ResponseEntity.ok(prod.get());
 		else		
-			 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestErrors("Producto no encontrado"));
+			 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestControllerError("Producto no encontrado"));
 	}
 	
 	@DeleteMapping(value="/{id}")
@@ -69,20 +69,20 @@ public class ProductosRestController {
 			try {
 				productosService.deleteById(id);				
 			}catch(DataIntegrityViolationException ex) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RestErrors(String.format("El producto %s tiene pedidos asociados", id)));
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RestControllerError(String.format("El producto %s tiene pedidos asociados", id)));
 			}
 			return ResponseEntity.noContent().build();
 		}else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestErrors("Producto no encontrado"));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestControllerError("Producto no encontrado"));
 		}
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ArrayList<RestErrors> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        ArrayList<RestErrors> errores = new ArrayList<>();
+    public ArrayList<RestControllerError> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ArrayList<RestControllerError> errores = new ArrayList<>();
         for(ObjectError error:ex.getBindingResult().getAllErrors()) {
-        	errores.add(new RestErrors(((FieldError) error).getField() +" "+ error.getDefaultMessage()));
+        	errores.add(new RestControllerError(((FieldError) error).getField() +" "+ error.getDefaultMessage()));
         }
         return errores;
     }

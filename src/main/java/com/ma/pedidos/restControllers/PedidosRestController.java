@@ -26,7 +26,7 @@ import com.ma.pedidos.daoControllers.pedidos.IPedidosService;
 import com.ma.pedidos.daoControllers.productos.IProductosService;
 import com.ma.pedidos.entities.PedidoCabecera;
 import com.ma.pedidos.entities.Producto;
-import com.ma.pedidos.error.RestErrors;
+import com.ma.pedidos.error.RestControllerError;
 
 @RestController
 @RequestMapping (value="pedidos")
@@ -70,15 +70,15 @@ public class PedidosRestController {
 		if(noEncontrados.isEmpty())
 			return ResponseEntity.status(HttpStatus.CREATED).body(pedidosService.save(pedido));
 		else
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RestErrors(String.format("Productos no encontrados: %s", String.join(",", noEncontrados))));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RestControllerError(String.format("Productos no encontrados: %s", String.join(",", noEncontrados))));
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ArrayList<RestErrors> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        ArrayList<RestErrors> errores = new ArrayList<>();
+    public ArrayList<RestControllerError> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ArrayList<RestControllerError> errores = new ArrayList<>();
         for(ObjectError error:ex.getBindingResult().getAllErrors()) {
-        	errores.add(new RestErrors(((FieldError) error).getField() +" "+ error.getDefaultMessage()));
+        	errores.add(new RestControllerError(((FieldError) error).getField() +" "+ error.getDefaultMessage()));
         }
         return errores;
     }
